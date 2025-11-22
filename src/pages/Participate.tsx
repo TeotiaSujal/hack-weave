@@ -7,10 +7,30 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Participate = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [skillFilter, setSkillFilter] = useState("all");
+  const [joinedTeams, setJoinedTeams] = useState<number[]>([]);
+
+  const handleJoinTeam = (teamId: number, teamName: string) => {
+    if (joinedTeams.includes(teamId)) {
+      toast({
+        title: "Already Requested",
+        description: `You've already sent a request to join ${teamName}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setJoinedTeams([...joinedTeams, teamId]);
+    toast({
+      title: "Join Request Sent! 🎉",
+      description: `Your request to join ${teamName} has been sent to the team leader.`,
+    });
+  };
 
   const teams = [
     {
@@ -115,8 +135,12 @@ const Participate = () => {
                       </div>
                     </div>
                   </div>
-                  <Button className="bg-gradient-primary hover:opacity-90">
-                    Join Team
+                  <Button 
+                    className="bg-gradient-primary hover:opacity-90"
+                    onClick={() => handleJoinTeam(team.id, team.name)}
+                    disabled={joinedTeams.includes(team.id)}
+                  >
+                    {joinedTeams.includes(team.id) ? "Request Sent" : "Join Team"}
                   </Button>
                 </div>
               </CardHeader>
